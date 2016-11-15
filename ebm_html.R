@@ -12,7 +12,7 @@ library(tidyr)   # For extended cleanup I'm to lazy to implement in base R
 #### Regular EBM files (one html file per EBM, usually) ####
 ebm_files <- list.files("EBMBrowserHtml/ebm/html/", pattern = "^\\d{3}.*", full.names = T)
 
-ebm_tabelle <- plyr::ldply(ebm_files, function(file) {
+ebm_html <- plyr::ldply(ebm_files, function(file) {
                   
                   raw <- read_html(file, encoding = "ISO-8859-1")
                   
@@ -47,7 +47,7 @@ ebm_old <- html_table(ebm_old, fill = TRUE)
 ebm_old <- ebm_old[[3]]
 ebm_old <- ebm_old[-1, c(1, 2)]
 ebm_old <- ebm_old[ebm_old[1] != "", ]
-names(ebm_old) <- names(ebm_tabelle)[c(1, 2)] 
+names(ebm_old) <- names(ebm_html)[c(1, 2)] 
 
 #### "Nicht gesondert berechnungsfähige ..." ####
 
@@ -66,19 +66,19 @@ ebm_special         <- tidyr::separate_rows(ebm_special, ebmcode, sep = ", ")
 
 #### Union individual tables and write ####
 
-# ebm_tabelle_full         <- dplyr::bind_rows(ebm_tabelle, ebm_old, ebm_special)
+# ebm_tabelle_full         <- dplyr::bind_rows(ebm_html, ebm_old, ebm_special)
 
 # Bind explicitly only previously unmatched ebmcodes
-ebm_tabelle_full <- bind_rows(ebm_tabelle, 
-                              filter(ebm_old, !(ebm_old$ebmcode %in% ebm_tabelle$ebmcode)))
+ebm_tabelle_full <- bind_rows(ebm_html, 
+                              filter(ebm_old, !(ebm_old$ebmcode %in% ebm_html$ebmcode)))
 ebm_tabelle_full <- bind_rows(ebm_tabelle_full,
                               filter(ebm_special, !(ebm_special$ebmcode %in% ebm_tabelle_full$ebmcode)))
                               
 # Guess NA price from value below to easily identify duplicate rows
-ebm_tabelle_full         <- tidyr::fill(ebm_tabelle_full, price, .direction = "up")
+ebm_html         <- tidyr::fill(ebm_tabelle_full, price, .direction = "up")
 # Remove duplicate rows
-ebm_tabelle_full         <- dplyr::distinct(ebm_tabelle_full)
-ebm_tabelle_full$ebmcode <- as.character(ebm_tabelle_full$ebmcode)
+ebm_html         <- dplyr::distinct(ebm_html)
+ebm_html$ebmcode <- as.character(ebm_html$ebmcode)
 
 # Write table to disk
 readr::write_delim(ebm_tabelle_full, "ebm_tabelle.csv", delim = ";")
