@@ -50,9 +50,11 @@ names(ebm_old) <- names(ebm_tabelle)[c(1, 2)]
 
 # Union them
 
-ebm_tabelle_full <- dplyr::bind_rows(ebm_tabelle, ebm_old)
+ebm_tabelle_full         <- dplyr::bind_rows(ebm_tabelle, ebm_old)
+ebm_tabelle_full$ebmcode <- as.character(ebm_tabelle_full$ebmcode)
 
 # Write table to disk
-readr::write_delim(ebm_tabelle, "ebm_tabelle.csv", delim = ";")
+readr::write_delim(ebm_tabelle_full, "ebm_tabelle.csv", delim = ";")
+saveRDS(ebm_tabelle_full, file = "ebm_tabelle.RDS")
 
 
