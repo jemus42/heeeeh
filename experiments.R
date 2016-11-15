@@ -13,7 +13,7 @@ ebm_files <- list.files("EBMBrowserHtml/ebm/html/", pattern = "^\\d{3}.*", full.
 
 ebm_tabelle <- plyr::ldply(ebm_files, function(file) {
                   
-                  raw <- read_html(file, encoding = "UTF-8")
+                  raw <- read_html(file, encoding = "ISO-8859-1")
                   
                   # Code
                   raw_code <- html_node(raw, ".ebm_head:nth-child(1)")
@@ -21,7 +21,8 @@ ebm_tabelle <- plyr::ldply(ebm_files, function(file) {
                   code     <- str_extract(raw_code, "^\\w*")
                   
                   # Beschreibung (Titel)
-                  raw_label <- html_node(raw, ".ebm_head:nth-child(2)")
+                  #raw_label <- html_node(raw, ".ebm_head:nth-child(2)")
+                  raw_label <- html_node(raw, ":nth-child(4)")
                   label     <- html_text(raw_label)
                   
                   # Preis
@@ -53,3 +54,5 @@ ebm_tabelle_full <- dplyr::bind_rows(ebm_tabelle, ebm_old)
 
 # Write table to disk
 readr::write_delim(ebm_tabelle, "ebm_tabelle.csv", delim = ";")
+
+
