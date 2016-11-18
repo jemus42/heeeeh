@@ -79,19 +79,19 @@ ebm_special         <- tidyr::separate_rows(ebm_special, ebmcode, sep = ", ")
 # ebm_tabelle_full         <- dplyr::bind_rows(ebm_html, ebm_old, ebm_special)
 
 # Bind explicitly only previously unmatched ebmcodes
-ebm_tabelle_full <- bind_rows(ebm_html,
+ebm_full <- bind_rows(ebm_html,
                               filter(ebm_old, !(ebm_old$ebmcode %in% ebm_html$ebmcode)))
-ebm_tabelle_full <- bind_rows(ebm_tabelle_full,
-                              filter(ebm_special, !(ebm_special$ebmcode %in% ebm_tabelle_full$ebmcode)))
+ebm_full <- bind_rows(ebm_full,
+                     filter(ebm_special, !(ebm_special$ebmcode %in% ebm_tabelle_full$ebmcode)))
 
 # Guess NA price from value below to easily identify duplicate rows
-ebm_html         <- tidyr::fill(ebm_tabelle_full, price, .direction = "up")
+ebm_full         <- tidyr::fill(ebm_full, price, .direction = "up")
 # Remove duplicate rows
-ebm_html         <- dplyr::distinct(ebm_html)
-ebm_html$ebmcode <- as.character(ebm_html$ebmcode)
+ebm_full         <- dplyr::distinct(ebm_full)
+ebm_full$ebmcode <- as.character(ebm_full$ebmcode)
 
 # Write table to disk
-readr::write_delim(ebm_tabelle_full, "ebm_tabelle.csv", delim = ";")
-saveRDS(ebm_tabelle_full, file = "ebm_tabelle.RDS")
+readr::write_delim(ebm_full, "ebm_tabelle.csv", delim = ";")
+saveRDS(ebm_full, file = "ebm_tabelle.RDS")
 
 
