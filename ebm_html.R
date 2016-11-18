@@ -79,7 +79,7 @@ ebm_special         <- tidyr::separate_rows(ebm_special, ebmcode, sep = ", ")
 ebm_full <- bind_rows(ebm_html,
                       filter(ebm_old, !(ebm_old$ebmcode %in% ebm_html$ebmcode)))
 ebm_full <- bind_rows(ebm_full,
-                     filter(ebm_special, !(ebm_special$ebmcode %in% ebm_tabelle_full$ebmcode)))
+                     filter(ebm_special, !(ebm_special$ebmcode %in% ebm_full$ebmcode)))
 
 # Guess NA price from value below to easily identify duplicate rows
 ebm_full         <- tidyr::fill(ebm_full, price, .direction = "up")
