@@ -47,7 +47,7 @@ parse_ebm_file <- function(file) {
   return(tbl)
 }
 
-
+# Loop function over all the ebm files, return data.frame
 ebm_html <- plyr::ldply(ebm_files, parse_ebm_file, .progress = "text")
 
 #### Get old EBMs for completion's sake ####
@@ -57,7 +57,7 @@ ebm_old <- html_table(ebm_old, fill = TRUE)
 ebm_old <- ebm_old[[3]]
 ebm_old <- ebm_old[-1, c(1, 2)]
 ebm_old <- ebm_old[ebm_old[1] != "", ]
-names(ebm_old) <- names(ebm_html)[c(1, 2)]
+names(ebm_old) <- c("ebmcode", "ebmlabel")
 
 #### "Nicht gesondert berechnungsfähige ..." ####
 
@@ -75,12 +75,9 @@ ebm_special$ebmcode <- str_replace_all(ebm_special$ebmcode, pattern = "/", repla
 ebm_special         <- tidyr::separate_rows(ebm_special, ebmcode, sep = ", ")
 
 #### Union individual tables and write ####
-
-# ebm_tabelle_full         <- dplyr::bind_rows(ebm_html, ebm_old, ebm_special)
-
 # Bind explicitly only previously unmatched ebmcodes
 ebm_full <- bind_rows(ebm_html,
-                              filter(ebm_old, !(ebm_old$ebmcode %in% ebm_html$ebmcode)))
+                      filter(ebm_old, !(ebm_old$ebmcode %in% ebm_html$ebmcode)))
 ebm_full <- bind_rows(ebm_full,
                      filter(ebm_special, !(ebm_special$ebmcode %in% ebm_tabelle_full$ebmcode)))
 
