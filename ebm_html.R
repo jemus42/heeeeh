@@ -23,6 +23,7 @@ parse_ebm_file <- function(file) {
 
   if (str_detect(code, " - ")) {
     code <- str_split(code, " - ", 2, simplify = T)[1, ]
+    code <- code[1]:code[2]
   }
 
   # Beschreibung (Titel)
@@ -30,7 +31,7 @@ parse_ebm_file <- function(file) {
   raw_label <- html_node(raw, ".ebm_sectiontext:nth-child(4)")
   label     <- html_text(raw_label)
   label     <- str_replace_all(label, "\\r\\n", "")
-  labek     <- str_trim(label, "both")
+  label     <- str_trim(label, "both")
 
   # Preis
   raw_price <- html_node(raw, "tr:nth-child(2) .ebm_leistungsum")
